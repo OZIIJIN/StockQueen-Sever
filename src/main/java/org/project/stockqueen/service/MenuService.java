@@ -2,11 +2,16 @@ package org.project.stockqueen.service;
 
 import lombok.RequiredArgsConstructor;
 import org.project.stockqueen.dto.DemandForecastingResponse;
+import org.project.stockqueen.dto.LstmResponse;
 import org.project.stockqueen.entity.Menu;
 import org.project.stockqueen.repository.DemandJpaRepository;
 import org.project.stockqueen.repository.MenuJpaRepository;
-import org.project.stockqueen.repository.SalesHistoryJpaRepository;
+import org.project.stockqueen.repository.sales_history.SalesHistoryJpaRepository;
+import org.project.stockqueen.repository.sales_history.SalesHistoryQuery;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -14,7 +19,9 @@ public class MenuService {
 
   private final DemandJpaRepository demandJpaRepository;
   private final SalesHistoryJpaRepository salesHistoryJpaRepository;
+  private final SalesHistoryQuery salesHistoryQuery;
   private final MenuJpaRepository menuJpaRepository;
+  private final RestTemplate restTemplate;
 
   public DemandForecastingResponse getDemandForecasting(String menuName) {
 
@@ -22,13 +29,32 @@ public class MenuService {
         .orElseThrow(() -> new IllegalArgumentException("해당 메뉴는 존재하지 않습니다."));
 
     //flask로 수요 예측 결과를 받아와야함
+    String url = "http://127.0.0.1:5000/menu-predictions";
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Content-Type", "application/json");
+
+    String requestBody = String.format("{\"menu_id\": %d}", menu.getId());
+
+    HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+    LstmResponse response = restTemplate.postForObject(
+        url,
+        requestEntity,
+        LstmResponse.class
+    );
 
     //받아온 결과를 db에 저장하고
 
     //response를 만들어서(현재 월/수량, 예측 월/수량) 전달
 
+    int previousSum = salesHistoryQuery.sumSalesByMonth(menu.getId());
+
+    long predictedSum = Math.round(
+        response.getPrediction().stream().mapToDouble(Double::doubleValue).sum());
+
     return new DemandForecastingResponse(
-        9, 194, 10, 245, "딸기라떼"
+        11, previousSum, 12, (int) predictedSum, menu.getMenuName()
     );
   }
 }
