@@ -36,6 +36,12 @@ public class Ingredient {
   @Column
   private String unit;
 
+  @Column
+  private String expiryDate;
+
+  @Column
+  private Integer max;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "ingredientGroup_id")
   private IngredientGroup ingredientGroup;
