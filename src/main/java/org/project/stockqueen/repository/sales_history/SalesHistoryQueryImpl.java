@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class SalesHistoryRepository implements SalesHistoryQuery {
+public class SalesHistoryQueryImpl implements SalesHistoryQuery {
 
   private final JPAQueryFactory queryFactory;
 
