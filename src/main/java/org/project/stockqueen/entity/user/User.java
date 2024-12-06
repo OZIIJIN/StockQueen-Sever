@@ -29,4 +29,7 @@ public class User {
 
   @Column
   private int password;
+
+  @Column
+  private String fcmToken;
 }
