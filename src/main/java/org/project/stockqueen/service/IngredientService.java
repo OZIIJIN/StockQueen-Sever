@@ -2,6 +2,7 @@ package org.project.stockqueen.service;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +17,6 @@ import org.project.stockqueen.repository.MenuJpaRepository;
 import org.project.stockqueen.repository.menurecipe.MenuRecipeJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.project.stockqueen.dto.IngredientListResponse;
-import org.project.stockqueen.dto.IngredientResponse;
-import org.project.stockqueen.entity.Ingredient;
-import org.project.stockqueen.repository.IngredientJpaRepository;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -38,12 +31,16 @@ public class IngredientService {
   public IngredientListResponse getIngredientList() {
     List<Ingredient> list = ingredientJpaRepository.findAll();
     List<IngredientResponse> responses = new ArrayList<>();
+    LocalDate now = LocalDate.now();
 
     for (Ingredient i : list) {
       double remain = (double) i.getRemain() / i.getMax();
 
+      LocalDate parsedDate = LocalDate.parse(i.getExpiryDate());
+      boolean isPast = now.isAfter(parsedDate);
+
       IngredientResponse ingredientResponse = new IngredientResponse(i.getIngredientName(),
-          i.getExpiryDate(), String.valueOf(remain) + " " + String.valueOf(i.getUnit()), false);
+          i.getExpiryDate(), String.valueOf(remain) + " " + String.valueOf(i.getUnit()), isPast);
 
       responses.add(ingredientResponse);
     }
@@ -61,7 +58,7 @@ public class IngredientService {
       Ingredient usedIngredient = m.getIngredient();
       int usedAmount = m.getUsedAmount();
 
-      usedIngredient.updateAmount(usedAmount);
+      usedIngredient.subtractAmount(usedAmount);
 
       // 재고 현황이 재주문점보다 작으면 fcm 메세지 전송
       if (usedIngredient.getRemain() <= usedIngredient.getReorderPoint()) {
@@ -93,4 +90,11 @@ public class IngredientService {
     }
   }
 
+  @Transactional
+  public void createIngredient() {
+    Ingredient ingredient = ingredientJpaRepository.findByIngredientName("얼그레이 파우더")
+        .orElseThrow(() -> new IllegalArgumentException("해당 재고는 존재하지 않습니다."));
+
+    ingredient.addAmount();
+  }
 }
