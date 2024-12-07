@@ -7,11 +7,11 @@ public class DemandForecastingResponse {
 
   private String previousMonth;
 
-  private int previousSales;
+  private double previousSales;
 
   private String predictedMonth;
 
-  private int predictedSales;
+  private double predictedSales;
 
   private String menuName;
 
