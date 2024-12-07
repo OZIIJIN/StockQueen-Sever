@@ -32,7 +32,7 @@ public class MenuService {
         .orElseThrow(() -> new IllegalArgumentException("해당 메뉴는 존재하지 않습니다."));
 
     //flask로 수요 예측 결과를 받아와야함
-    String url = "http://127.0.0.1:5000/menu-predictions";
+    String url = "https://5808-122-36-149-213.ngrok-free.app/menu-predictions";
 
     HttpHeaders headers = new HttpHeaders();
     headers.set("Content-Type", "application/json");
