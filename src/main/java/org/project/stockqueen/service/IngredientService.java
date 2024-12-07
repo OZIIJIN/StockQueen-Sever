@@ -55,7 +55,7 @@ public class IngredientService {
     Menu menu = menuJpaRepository.findByMenuName(menuName)
         .orElseThrow(() -> new IllegalArgumentException("해당 메뉴는 존재하지 않습니다."));
 
-    User user = userJpaRepository.findByName("서예진");
+    User user = userJpaRepository.findByName("1518");
 
     List<MenuRecipe> menuRecipes = menuRecipeJpaRepository.findByMenu(menu);
 
