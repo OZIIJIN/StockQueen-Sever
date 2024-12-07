@@ -13,40 +13,25 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @Table
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ingredient {
+public class MenuRecipe {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column
-  private String ingredientName;
+  private int usedAmount;
 
-  @Column
-  private Integer remain;
-
-  @Column
-  private Integer reorderPoint;
-
-  @Column
-  private String unit;
-
-  @Column
-  private String expiryDate;
-
-  @Column
-  private Integer max;
-
+  @JoinColumn(name = "menu_id")
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "ingredientGroup_id")
-  private IngredientGroup ingredientGroup;
+  private Menu menu;
 
-  public void updateAmount(int usedAmount) {
-    this.remain -= usedAmount;
-  }
+  @JoinColumn(name = "ingredient_id")
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Ingredient ingredient;
 }
