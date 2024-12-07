@@ -21,7 +21,7 @@ public class FirebaseConfig {
 
   @Bean
   public FirebaseApp firebaseApp() throws IOException {
-    System.out.println("FIREBASE_KEY_PATH: " + System.getenv("FIREBASE_KEY_PATH"));
+    System.out.println("FIREBASE_KEY_PATH: " + System.getenv("Firebase_Key"));
     ClassPathResource resource = new ClassPathResource(fcmKeyPath);
     try (InputStream serviceAccount = resource.getInputStream()) {
       FirebaseOptions options = FirebaseOptions.builder()
