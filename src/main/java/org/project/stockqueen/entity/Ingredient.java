@@ -46,7 +46,11 @@ public class Ingredient {
   @JoinColumn(name = "ingredientGroup_id")
   private IngredientGroup ingredientGroup;
 
-  public void updateAmount(int usedAmount) {
+  public void subtractAmount(int usedAmount) {
     this.remain -= usedAmount;
+  }
+
+  public void addAmount() {
+    this.remain += max;
   }
 }
