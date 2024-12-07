@@ -49,5 +49,4 @@ public class Ingredient {
   public void updateAmount(int usedAmount) {
     this.remain -= usedAmount;
   }
-
 }
