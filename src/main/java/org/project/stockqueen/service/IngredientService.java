@@ -12,8 +12,10 @@ import org.project.stockqueen.dto.IngredientResponse;
 import org.project.stockqueen.entity.Ingredient;
 import org.project.stockqueen.entity.Menu;
 import org.project.stockqueen.entity.MenuRecipe;
+import org.project.stockqueen.entity.user.User;
 import org.project.stockqueen.repository.IngredientJpaRepository;
 import org.project.stockqueen.repository.MenuJpaRepository;
+import org.project.stockqueen.repository.UserJpaRepository;
 import org.project.stockqueen.repository.menurecipe.MenuRecipeJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class IngredientService {
   private final MenuJpaRepository menuJpaRepository;
   private final MenuRecipeJpaRepository menuRecipeJpaRepository;
   private final FcmService fcmService;
+  private final UserJpaRepository userJpaRepository;
 
   @Transactional(readOnly = true)
   public IngredientListResponse getIngredientList() {
@@ -48,9 +51,11 @@ public class IngredientService {
   }
 
   @Transactional
-  public void updateIngredientOnSale(String menuName, String fcmToken) {
+  public void updateIngredientOnSale(String menuName) {
     Menu menu = menuJpaRepository.findByMenuName(menuName)
         .orElseThrow(() -> new IllegalArgumentException("해당 메뉴는 존재하지 않습니다."));
+
+    User user = userJpaRepository.findByName("서예진");
 
     List<MenuRecipe> menuRecipes = menuRecipeJpaRepository.findByMenu(menu);
 
@@ -62,8 +67,13 @@ public class IngredientService {
 
       // 재고 현황이 재주문점보다 작으면 fcm 메세지 전송
       if (usedIngredient.getRemain() <= usedIngredient.getReorderPoint()) {
-        sendNotification(usedIngredient.getIngredientName(), fcmToken);
+        sendNotification(usedIngredient.getIngredientName(), user.getFcmToken());
       }
+
+      // 유통기한 일주일전이면 fcm 메세지 전송
+      LocalDate now = LocalDate.now();
+      LocalDate parsedDate = LocalDate.parse(usedIngredient.getExpiryDate());
+      boolean isExpiringSoon = !now.plusDays(7).isBefore(parsedDate);
     }
 
   }

@@ -32,4 +32,12 @@ public class User {
 
   @Column
   private String fcmToken;
+
+  public User(org.project.stockqueen.entity.user.role role, String nickname, int password,
+      String fcmtoken) {
+    this.role = role;
+    this.name = nickname;
+    this.password = password;
+    this.fcmToken = fcmtoken;
+  }
 }
