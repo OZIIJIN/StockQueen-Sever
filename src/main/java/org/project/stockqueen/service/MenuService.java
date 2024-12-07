@@ -1,8 +1,11 @@
 package org.project.stockqueen.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.project.stockqueen.dto.DemandForecastingResponse;
 import org.project.stockqueen.dto.LstmResponse;
+import org.project.stockqueen.dto.MenuNameResponseDto;
 import org.project.stockqueen.entity.Menu;
 import org.project.stockqueen.repository.DemandJpaRepository;
 import org.project.stockqueen.repository.MenuJpaRepository;
@@ -56,5 +59,15 @@ public class MenuService {
     return new DemandForecastingResponse(
         11, previousSum, 12, (int) predictedSum, menu.getMenuName()
     );
+  }
+
+  public MenuNameResponseDto getMenuNames() {
+    List<Menu> menus = menuJpaRepository.findAll();
+    List<String> menuNameList = new ArrayList<>();
+
+    for (Menu m : menus) {
+      menuNameList.add(m.getMenuName());
+    }
+    return new MenuNameResponseDto(menuNameList);
   }
 }
