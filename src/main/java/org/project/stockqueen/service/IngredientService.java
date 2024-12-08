@@ -109,7 +109,9 @@ public class IngredientService {
 
     FCMSendDto fcmSendDto = FCMSendDto.builder()
         .token(user.getFcmToken())
-        .title(ingredient.getIngredientName() + " 등록되었습니다!")
+        .title(ingredient.getIngredientName() + " 등록!")
+        .body(ingredient.getIngredientName() + "가 " + String.valueOf(ingredient.getMax())
+            + ingredient.getUnit() + " 등록되었습니다.")
         .build();
     sendNotification(fcmSendDto);
 
