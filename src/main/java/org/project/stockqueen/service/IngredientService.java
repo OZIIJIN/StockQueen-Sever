@@ -67,7 +67,12 @@ public class IngredientService {
 
       // 재고 현황이 재주문점보다 작으면 fcm 메세지 전송
       if (usedIngredient.getRemain() <= usedIngredient.getReorderPoint()) {
-        sendNotification(usedIngredient.getIngredientName(), user.getFcmToken());
+        FCMSendDto fcmSendDto = FCMSendDto.builder()
+            .token(user.getFcmToken())
+            .title(usedIngredient.getIngredientName() + " 재주문하세요!")
+            .body("지금 재주문해야 품절을 방지할 수 있어요.")
+            .build();
+        sendNotification(fcmSendDto);
       }
 
       // 유통기한 일주일전이면 fcm 메세지 전송
@@ -78,12 +83,7 @@ public class IngredientService {
 
   }
 
-  private void sendNotification(String ingredientName, String fcmToken) {
-    FCMSendDto fcmSendDto = FCMSendDto.builder()
-        .token(fcmToken)
-        .title(ingredientName + " 재주문하세요!")
-        .body("지금 재주문해야 품절을 방지할 수 있어요.")
-        .build();
+  private void sendNotification(FCMSendDto fcmSendDto) {
 
     int retryCount = 3;
     int attempt = 0;
@@ -104,6 +104,14 @@ public class IngredientService {
   public void createIngredient() {
     Ingredient ingredient = ingredientJpaRepository.findByIngredientName("얼그레이 파우더")
         .orElseThrow(() -> new IllegalArgumentException("해당 재고는 존재하지 않습니다."));
+
+    User user = userJpaRepository.findByName("1518");
+
+    FCMSendDto fcmSendDto = FCMSendDto.builder()
+        .token(user.getFcmToken())
+        .title(ingredient.getIngredientName() + " 등록되었습니다!")
+        .build();
+    sendNotification(fcmSendDto);
 
     ingredient.addAmount();
   }
